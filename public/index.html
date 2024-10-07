@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('https://asset.gecdesigns.com/img/background-templates/abstract-navy-red-background-design-sr17012401-1705501852665-cover.webp') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #chatbox {
+            width: 400px; /* Increased width */
+            height: 500px; /* Increased height */
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        #chat {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            height: calc(100% - 40px);
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        #chat li {
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        #chat .user {
+            background: #dcf8c6;
+            text-align: right;
+        }
+        #chat .bot {
+            background: #ececec;
+        }
+        #message {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="chatbox">
+        <ul id="chat"></ul>
+        <input type="text" id="message" placeholder="Type your message...">
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        const chat = document.getElementById('chat');
+        const messageInput = document.getElementById('message');
+
+        messageInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                const message = messageInput.value;
+                if (message) {
+                    addMessage('user', message);
+                    socket.emit('message', message);
+                    messageInput.value = '';
+                }
+            }
+        });
+
+        socket.on('response', function(response) {
+            addMessage('bot', response);
+        });
+
+        function addMessage(sender, text) {
+            const li = document.createElement('li');
+            li.className = sender;
+            li.textContent = text;
+            chat.appendChild(li);
+            chat.scrollTop = chat.scrollHeight;
+        }
+    </script>
+
+</body>
+</html>
